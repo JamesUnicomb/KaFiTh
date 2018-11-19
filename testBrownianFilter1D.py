@@ -8,7 +8,7 @@ from KalmanFilters import BrownianFilter
 
 bf = BrownianFilter()
 
-q = 1.0
+q = 2.0
 r = 0.25
 
 Q = [[q * q]]
@@ -17,7 +17,7 @@ R = [[r * r]]
 est_x = [[0.0]]
 est_p = [[[10.0]]]
 
-timedelta = 0.001
+timedelta = 0.0025
 
 
 t = np.arange(0.0, 1.0, timedelta)
@@ -56,12 +56,14 @@ plt.legend(loc='upper right')
 
 
 plt.subplot(212)
-plt.plot(t,np.array(est_x).reshape(-1)[1:] - gt, label='Kalman Filter Error')
+plt.plot(t,np.square(np.array(est_x).reshape(-1)[1:] - gt), label='Kalman Filter MSE')
 plt.fill_between(t,
-                 + 2.0 * np.sqrt(np.array(est_p, dtype=np.float32)[1:,0,0]),
-                 - 2.0 * np.sqrt(np.array(est_p, dtype=np.float32)[1:,0,0]),
-                 color='C0', alpha=0.2, label='2 sigma Error Bounds')
+                 4.0 * np.array(est_p, dtype=np.float32)[1:,0,0],
+                 0.0,
+                 color='C0', alpha=0.2, label='2 sigma Error Bound')
 plt.legend(loc='upper right')
 
 plt.tight_layout()
+plt.savefig('Results/BrownianMotion1D.png',
+            dpi=400)
 plt.show()

@@ -11,7 +11,7 @@ bf = BrownianFilter(state       = 'x1 x2',
                     measurement = 'z1 z2')
 
 q = 3.0
-r = 0.1
+r = 0.5
 
 Q = [[q * q,   0.0],
      [  0.0, q * q]]
@@ -22,7 +22,7 @@ est_x = [[0.0,0.0]]
 est_p = [[[10.0,  0.0],
           [ 0.0, 10.0]]]
 
-timedelta = 0.01
+timedelta = 0.002
 
 gs = gridspec.GridSpec(2, 2)
 ax1 = plt.subplot(gs[:, 0])
