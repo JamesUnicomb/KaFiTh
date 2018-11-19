@@ -8,7 +8,7 @@ from KalmanFilters import BrownianFilter
 
 bf = BrownianFilter()
 
-q = 0.05
+q = 0.1
 r = 0.25
 
 Q = [[q * q]]
@@ -53,13 +53,15 @@ plt.xlim([400,700])
 
 
 plt.subplot(212)
-plt.plot(t,np.array(est_x).reshape(-1)[1:] - gt, label='Kalman Filter Error')
+plt.plot(t,np.square(np.array(est_x).reshape(-1)[1:] - gt), label='Kalman Filter MSE')
 plt.fill_between(t,
-                 + 2.0 * np.sqrt(np.array(est_p, dtype=np.float32)[1:,0,0]),
-                 - 2.0 * np.sqrt(np.array(est_p, dtype=np.float32)[1:,0,0]),
-                 color='C0', alpha=0.2, label='2 sigma Error Bounds')
+                 4.0 * np.array(est_p, dtype=np.float32)[1:,0,0],
+                 0.0,
+                 color='C0', alpha=0.2, label='2 sigma Error Bound')
 plt.xlim([400,700])
 plt.legend(loc='upper right')
 
 plt.tight_layout()
+plt.savefig('Results/MackeyGlassBrownianFilter.png',
+            dpi=400)
 plt.show()
