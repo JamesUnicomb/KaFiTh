@@ -17,3 +17,11 @@ If we have an underlying process that is Brownian and our measurement is corrupt
 ![](https://github.com/JamesUnicomb/KaFiTh/blob/master/Results/BrownianMotion1D.png)
 
 We can also forward predict which the plot shows. As this estimate is probabilistic we can use it in other models such as VAR (value at risk models).
+
+
+
+## Neural Network as a Motion Model
+
+We can train an autoressive neural network to forward predict the next time series measurement as shown in the figure below.
+
+![](https://github.com/JamesUnicomb/KaFiTh/blob/master/Results/AutoRegressiveModel.png)
