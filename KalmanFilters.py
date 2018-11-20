@@ -4,6 +4,16 @@ import theano
 import theano.tensor as T
 import theano.gradient as G
 
+import lasagne
+from lasagne.layers import InputLayer, DenseLayer, \
+                           get_output, get_all_params
+from lasagne.nonlinearities import rectify, linear
+from lasagne.objectives import squared_error
+from lasagne.regularization import regularize_network_params, l2 as L2
+from lasagne.updates import adam
+
+from sklearn.model_selection import train_test_split
+
 
 class BrownianFilter:
     def __init__(self,
@@ -91,3 +101,64 @@ class BrownianFilter:
                                      dt)
 
         return x_, p_
+
+
+class AutoRegressiveModel:
+    def __init__(self,
+                 steps      = 1,
+                 num_layers = 2,
+                 num_units  = 32,
+                 eps        = 1e-2,
+                 ):
+        self.steps = steps
+
+        self.X = T.fmatrix()
+        self.Y = T.fmatrix()
+
+        l = InputLayer(input_var = self.X,
+                       shape     = (None, steps))
+        for k in range(num_layers):
+            l = DenseLayer(l,
+                           num_units    = 32,
+                           nonlinearity = rectify)
+        l = DenseLayer(l,
+                       num_units    = 1,
+                       nonlinearity = linear)
+
+        self.x_ = get_output(l)
+
+        self.f  = theano.function([self.X],
+                                  self.x_,
+                                  allow_input_downcast=True)
+
+        l2_penalty = regularize_network_params(l,L2)
+        error = squared_error(self.x_, self.Y).mean()
+        loss = error + eps * l2_penalty
+        params = get_all_params(l)
+        updates = adam(loss,
+                       params)
+
+        self.error = theano.function([self.X,self.Y],
+                                     error,
+                                     allow_input_downcast=True)
+
+        self.train = theano.function([self.X,self.Y],
+                                     loss,
+                                     updates=updates,
+                                     allow_input_downcast=True)
+
+
+    def fit(self,
+            time_series,
+            test_size = 0.4):
+        X = np.array([time_series[i:i-self.steps] for i in range(self.steps)]).T
+        Y = np.array([time_series[i+self.steps:] for i in range(1)]).T
+
+        trX, teX, trY, teY = train_test_split(X, Y, test_size=test_size)
+
+        for k in range(1000):
+            self.train(trX,trY)
+            train_error = self.error(trX,trY)
+            test_error  = self.error(teX,teY)
+
+            print k, train_error, test_error

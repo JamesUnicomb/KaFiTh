@@ -17,7 +17,7 @@ R = [[r * r]]
 est_x = [[0.0]]
 est_p = [[[10.0]]]
 
-t,b = np.loadtxt('mgdata.txt', delimiter=',')[::10].T
+t,b = np.loadtxt('mgdata.txt', delimiter=',')[::20].T
 timedelta = np.mean(np.diff(t))
 
 plt.figure(figsize=(12,6))
