@@ -5,7 +5,7 @@ from KalmanFilters import AutoRegressiveModel
 t,b = np.loadtxt('mgdata.txt',delimiter=',')[::10].T
 dt = np.mean(np.diff(t))
 
-K = 40
+K = 50
 S = int(0.5 * len(b))
 E = -int(0.25 * len(b))
 ar = AutoRegressiveModel(K, num_units=64, eps=1e-3)
