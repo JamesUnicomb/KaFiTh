@@ -5,7 +5,7 @@ from KalmanFilters import BrownianFilter, AutoRegressiveExtendedKalmanFilter
 t,b = np.loadtxt('mgdata.txt',delimiter=',')[::10].T
 dt = np.mean(np.diff(t))
 
-K = 40
+K = 50
 S = int(0.5 * len(b))
 E = -int(0.25 * len(b))
 
@@ -13,7 +13,7 @@ bf = BrownianFilter()
 ekf = AutoRegressiveExtendedKalmanFilter(K, eps=1e-3)
 ekf.fit(b[:S])
 
-q = 0.25
+q = 0.15
 r = 0.25
 
 Q = [[q * q]]
