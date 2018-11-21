@@ -8,7 +8,7 @@ dt = np.mean(np.diff(t))
 K = 40
 S = int(0.5 * len(b))
 E = -int(0.25 * len(b))
-ar = AutoRegressiveModel(K, eps=1e-3)
+ar = AutoRegressiveModel(K, num_units=64, eps=1e-3)
 
 ar.fit(b[:S])
 
