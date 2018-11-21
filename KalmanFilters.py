@@ -218,17 +218,6 @@ class AutoRegressiveExtendedKalmanFilter:
         self.P__ = T.dot(T.identity_like(self.P) - T.dot(self.K, self.hX_), self.P_)
 
 
-        self.test_f = theano.function([self.X,
-                                       self.Z,
-                                       self.P,
-                                       self.Q,
-                                       self.R,
-                                       self.dt],
-                                       self.P__,
-                                       allow_input_downcast=True, on_unused_input='ignore')
-
-
-
         self.prediction = theano.function(inputs  = [self.X,
                                                      self.P,
                                                      self.Q,
