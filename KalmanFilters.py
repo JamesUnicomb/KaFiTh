@@ -6,6 +6,7 @@ import theano.gradient as G
 
 import lasagne
 from lasagne.layers import InputLayer, ReshapeLayer, DenseLayer, \
+                           RecurrentLayer, LSTMLayer, \
                            get_output, get_all_params, \
                            get_all_param_values, set_all_param_values
 from lasagne.nonlinearities import rectify, linear
@@ -110,6 +111,7 @@ class AutoRegressiveModel:
                  num_layers = 2,
                  num_units  = 32,
                  eps        = 1e-2,
+                 recurrent  = False,
                  ):
         self.steps = steps
 
@@ -117,6 +119,11 @@ class AutoRegressiveModel:
         self.Y = T.fmatrix()
 
         def network(l):
+            if recurrent:
+                l = ReshapeLayer(l,
+                                 shape = (-1, steps, 1))
+                l = LSTMLayer(l, num_units)
+
             for k in range(num_layers):
                 l = DenseLayer(l,
                                num_units    = num_units,
