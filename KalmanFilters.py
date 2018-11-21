@@ -116,15 +116,22 @@ class AutoRegressiveModel:
         self.X = T.fmatrix()
         self.Y = T.fmatrix()
 
+        def network(l):
+            for k in range(num_layers):
+                l = DenseLayer(l,
+                               num_units    = num_units,
+                               nonlinearity = rectify)
+            l = DenseLayer(l,
+                           num_units    = 1,
+                           nonlinearity = linear)
+
+            return l
+
+        self.network = network
+
         l = InputLayer(input_var = self.X,
                        shape     = (None, steps))
-        for k in range(num_layers):
-            l = DenseLayer(l,
-                           num_units    = num_units,
-                           nonlinearity = rectify)
-        l = DenseLayer(l,
-                       num_units    = 1,
-                       nonlinearity = linear)
+        l = self.network(l)
 
         self.l_ = l
         self.x_ = get_output(self.l_)
@@ -186,14 +193,7 @@ class AutoRegressiveExtendedKalmanFilter:
         l = InputLayer(input_var = self.X,
                        shape     = (steps,))
         l = ReshapeLayer(l, shape = (1,steps,))
-
-        for k in range(num_layers):
-            l = DenseLayer(l,
-                           num_units    = num_units,
-                           nonlinearity = rectify)
-        l = DenseLayer(l,
-                       num_units    = 1,
-                       nonlinearity = linear)
+        l = self.ar.network(l)
         l = ReshapeLayer(l, shape=(1,))
 
         self.l_ = l
