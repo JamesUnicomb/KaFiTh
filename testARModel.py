@@ -10,7 +10,7 @@ S = int(0.5 * len(b))
 E = -int(0.25 * len(b))
 ar = AutoRegressiveModel(K, eps=1e-3)
 
-print ar.fit(b[:S])
+ar.fit(b[:S])
 
 test = np.array([b[S:E][i:i-K] for i in range(K)]).T
 res  = list(ar.f(test).reshape(-1))

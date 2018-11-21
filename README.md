@@ -25,3 +25,10 @@ We can also forward predict which the plot shows. As this estimate is probabilis
 We can train an autoressive neural network to forward predict the next time series measurement as shown in the figure below.
 
 ![](https://github.com/JamesUnicomb/KaFiTh/blob/master/Results/AutoRegressiveModel.png)
+
+
+### Extended Kalman Filter with AutoRegressive Motion Model
+
+We can use the autoregressive model within an EKF framework to make better predictions about the next state of a time series.
+
+![](https://github.com/JamesUnicomb/KaFiTh/blob/master/Results/AutoRegressiveEKF.png)
