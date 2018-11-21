@@ -9,7 +9,7 @@ from lasagne.layers import InputLayer, ReshapeLayer, DenseLayer, \
                            RecurrentLayer, LSTMLayer, \
                            get_output, get_all_params, \
                            get_all_param_values, set_all_param_values
-from lasagne.nonlinearities import rectify, linear
+from lasagne.nonlinearities import rectify, linear, tanh
 from lasagne.objectives import squared_error
 from lasagne.regularization import regularize_network_params, l2 as L2
 from lasagne.updates import adam
@@ -107,11 +107,12 @@ class BrownianFilter:
 
 class AutoRegressiveModel:
     def __init__(self,
-                 steps      = 1,
-                 num_layers = 2,
-                 num_units  = 32,
-                 eps        = 1e-2,
-                 recurrent  = False,
+                 steps        = 1,
+                 num_layers   = 2,
+                 num_units    = 32,
+                 eps          = 1e-2,
+                 recurrent    = False,
+                 nonlinearity = tanh,
                  ):
         self.steps = steps
 
@@ -127,7 +128,7 @@ class AutoRegressiveModel:
             for k in range(num_layers):
                 l = DenseLayer(l,
                                num_units    = num_units,
-                               nonlinearity = rectify)
+                               nonlinearity = nonlinearity)
             l = DenseLayer(l,
                            num_units    = 1,
                            nonlinearity = linear)

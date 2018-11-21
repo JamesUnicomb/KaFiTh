@@ -10,7 +10,9 @@ S = int(0.5 * len(b))
 E = -int(0.25 * len(b))
 
 bf = BrownianFilter()
-ekf = AutoRegressiveExtendedKalmanFilter(K, eps=1e-3)
+ekf = AutoRegressiveExtendedKalmanFilter(K,
+                                         num_units=64,
+                                         eps=5e-3)
 ekf.fit(b[:S])
 
 q = 0.15
