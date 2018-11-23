@@ -74,4 +74,4 @@ SqrtX = sqrtm(X)                 #This gives you the square root of the matrix X
 
 ### Speed Pay-Off
 From the plot, we can see that the precompiled theano function is an order of magnitude (approx. 6 times faster than using a scipy function).
-![]((https://github.com/JamesUnicomb/KaFiTh/blob/master/Results/MatrixSquareRootTiming.png)
+![](https://github.com/JamesUnicomb/KaFiTh/blob/master/Results/MatrixSquareRootTiming.png)
