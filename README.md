@@ -39,3 +39,39 @@ We can use the autoregressive model within an EKF framework to make better predi
 Using a model for prediction makes the future estimates more accurate as shown in the plot below.
 
 ![](https://github.com/JamesUnicomb/KaFiTh/blob/master/Results/AutoRegressiveEKFPrediction.png)
+
+
+## Matrix Square Root in Python
+
+We can use theano to make a significant decrease in timing (although it takes time to precompile). This is useful for the implementation of the Unscented Kalman Filter or if you have to calculate the matrix square root multiple times.
+
+### How to Use
+There is currently no error handling. If the matrix is not of a particular type the result will be nan.
+
+#### Precompile
+If you want a precompiling function for calculating the matrix square root:
+```
+from KalmanFilters import sqrtm
+A     = ~(positive semi-definite matrix - covariance matrix)
+sqrtm = sqrtm() # THIS PRECOMPILES THE FUNCTION
+B     = sqrtm(A)
+
+sum(square(B * B - A)) < eps # Where eps is a small value
+```
+
+#### As a Theano variable
+If you want to use this in already existing code as a Theano function:
+```
+import theano
+from KalmanFilters import MatrixSqrt
+
+sqrtm = MatrixSqrt()
+
+X     = theano.tensor.fmatrix()
+SqrtX = sqrtm(X)                 #This gives you the square root of the matrix X
+```
+
+
+### Speed Pay-Off
+From the plot, we can see that the precompiled theano function is an order of magnitude (approx. 6 times faster than using a scipy function).
+![]((https://github.com/JamesUnicomb/KaFiTh/blob/master/Results/AutoRegressiveEKFPrediction.png) | width=100))

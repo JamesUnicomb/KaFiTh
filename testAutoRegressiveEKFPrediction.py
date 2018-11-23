@@ -58,7 +58,7 @@ ekf_est_p = np.array(ekf_est_p)
 
 plt.figure(figsize=(12,3))
 plt.plot(t, b, 'k--', label='clean Mackey-Glass Series')
-plt.scatter(t, b_, c='k', marker='x', alpha=0.2, label='noisy')
+plt.scatter(t[:E], b_[:E], c='k', marker='x', alpha=0.2, label='noisy')
 plt.plot(t, ekf_est_x, c='C0', label='AREKF Estimate')
 plt.plot(t, bf_est_x, c='C1', label='BF Estimate')
 plt.fill_between(t,

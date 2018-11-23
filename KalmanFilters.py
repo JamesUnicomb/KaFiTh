@@ -276,19 +276,32 @@ class AutoRegressiveExtendedKalmanFilter:
 
 class MatrixSqrt:
     def __init__(self):
-        self.X = T.fmatrix()
-
         E = T.nlinalg.Eigh()
         I = T.nlinalg.MatrixInverse()
 
-        D, P = E(self.X)
-        D = T.nlinalg.diag(D)
-        P_ = I(P)
+        def SqrtM(X):
+            D, P = E(X)
+            D = T.nlinalg.diag(D)
+            P_ = I(P)
 
-        self.matrix_inv = theano.function([self.X],
-                                          T.dot(P,T.dot(T.sqrt(D),P_)),
-                                          allow_input_downcast=True)
+            return T.dot(P,T.dot(T.sqrt(D),P_))
 
-    def __call__(self,
-                 x):
-        return self.matrix_inv(x)
+        self.SqrtM = SqrtM
+
+    def __call__(self, X):
+        return self.SqrtM(X)
+
+
+
+class sqrtm:
+    def __init__(self):
+        self.X = T.fmatrix()
+
+        sqrtm = MatrixSqrt()
+
+        self.sqrtm = theano.function([self.X],
+                                     sqrtm(self.X),
+                                     allow_input_downcast=True)
+
+    def __call__(self, X):
+        return self.sqrtm(X)
