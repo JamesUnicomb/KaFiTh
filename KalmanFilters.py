@@ -193,6 +193,8 @@ class AutoRegressiveExtendedKalmanFilter:
         self.P, self.Q, self.R = T.fmatrices('P','Q','R')
         self.dt                = T.scalar('dt')
 
+        self.matrix_inv = T.nlinalg.MatrixInverse()
+
         self.ar = AutoRegressiveModel(steps      = steps,
                                       num_layers = num_layers,
                                       num_units  = num_units,
@@ -216,8 +218,6 @@ class AutoRegressiveExtendedKalmanFilter:
         self.y = self.Z - self.h
 
         self.hX_ = G.jacobian(self.h, self.X_)
-
-        self.matrix_inv = T.nlinalg.MatrixInverse()
 
         self.S = T.dot(T.dot(self.hX_, self.P_), T.transpose(self.hX_)) + self.R
         self.K = T.dot(T.dot(self.P_, T.transpose(self.hX_)), self.matrix_inv(self.S))
@@ -276,54 +276,107 @@ class AutoRegressiveExtendedKalmanFilter:
 
 class AutoRegressiveUnscentedKalmanFilter:
     def __init__(self,
-                 steps    = 1,
-                 alpha    = 1e-3,
-                 beta     = 1.0,
-                 kappa    = 0.1):
+                 steps      = 1,
+                 num_layers = 2,
+                 num_units  = 32,
+                 eps        = 1e-2,
+                 alpha      = 1e-3,
+                 beta       = 1.0,
+                 kappa      = 0.1):
 
         lam = alpha * alpha * (steps + kappa) - steps + beta
-
-        print lam
 
         self.X, self.Z         = T.fvectors('X','Z')
         self.P, self.Q, self.R = T.fmatrices('P','Q','R')
         self.dt                = T.scalar('dt')
 
         sqrtm = MatrixSqrt()
+        self.matrix_inv = T.nlinalg.MatrixInverse()
 
-        def weighted_mean(x,w):
+        self.ar = AutoRegressiveModel(steps      = steps,
+                                      num_layers = num_layers,
+                                      num_units  = num_units,
+                                      eps        = eps)
+
+        def weighted_mean(A,w):
             mu = T.zeros((steps, 1))
             for i in range(2 * steps + 1):
-                mu += w[i] * x[:,i:i+1]
+                mu += w[i] * A[:,i:i+1]
             return mu
 
-        def weighted_covariance(x,mu,w):
+        def weighted_covariance(A,B,a,b,w):
             sigma = T.zeros((steps,steps))
             for i in range(2 * steps + 1):
-                sigma += w[i] * T.dot((x[:,i:i+1] - mu), (x[:,i:i+1] - mu).T)
+                sigma += w[i] * T.dot((A[:,i:i+1] - a), (B[:,i:i+1] - b).T)
             return sigma
 
-        self.XB    = T.dot(T.stack(self.X).T, T.ones((1, 2 * steps +1)))
-        self.sqrtP = sqrtm(self.P)
 
-        self.XC = self.XB + T.concatenate([T.zeros((steps,1)),
-                                           T.sqrt(steps + lam) * self.sqrtP,
-                                           -T.sqrt(steps + lam) * self.sqrtP], axis=1)
+        self.sqrtP = sqrtm(self.P)
+        self.XB = T.dot(T.stack(self.X).T, T.ones((1, 2 * steps +1))) + T.concatenate([T.zeros((steps,1)),
+                                                                                       T.sqrt(steps + lam) * self.sqrtP,
+                                                                                       -T.sqrt(steps + lam) * self.sqrtP], axis=1)
+
+        l = InputLayer(input_var = self.XB.T,
+                       shape     = (2 * steps + 1, steps))
+        l = self.ar.network(l)
+        l = ReshapeLayer(l, shape=(1, 2 * steps + 1))
+
+        self.l_ = l
+        self.f_ = get_output(self.l_)
+
+        self.XC = T.concatenate([self.f_, T.dot(T.eye(steps)[:-1], self.XB)], axis=0)
 
         W_m = T.concatenate([(lam / (steps + lam)) * T.ones(1),
                              (1.0 / (2.0 * (steps + lam))) * T.ones(2 * steps)], axis=0)
         W_c = T.concatenate([(lam / (steps + lam) + (1.0 - alpha * alpha + beta)) * T.ones(1),
                              (1.0 / (2.0 * (steps + lam))) * T.ones(2 * steps)], axis=0)
 
-        print W_m.eval()
+        self.X_ = weighted_mean(self.XC, W_m)
+        self.P_ = weighted_covariance(self.XC, self.XC, self.X_, self.X_, W_c) + \
+                                      T.dot(T.dot(T.eye(steps)[:,0:1], self.dt * self.Q), T.eye(steps)[0:1,:])
 
-        self.mu     = weighted_mean(self.XC, W_m)
-        self.sigma  = weighted_covariance(self.XC, self.mu, W_c)
+        self.ZB = T.dot(T.eye(steps)[0:1,:], self.XC)
 
-        self.test_f = theano.function([self.X, self.P],
-                                      [self.mu, self.XC, self.sigma],
-                                      allow_input_downcast=True,
-                                      on_unused_input='ignore')
+        self.Z_  = weighted_mean(self.ZB, W_m)
+        self.S   = weighted_covariance(self.ZB, self.ZB, self.Z_, self.Z_, W_c) + self.R
+
+        self.K  = T.dot(weighted_covariance(self.XC, self.ZB, self.X_, self.Z_, W_c),
+                        self.matrix_inv(self.S))
+
+        self.X__ = self.X_ + T.dot(self.K, self.Z - self.Z_)
+        self.P__ = self.P_ - T.dot(T.dot(self.K, self.S), self.K.T)
+
+        # self.test_f = theano.function([self.X, self.P],
+        #                               [self.X_, self.K, self.P_],
+        #                               allow_input_downcast=True,
+        #                               on_unused_input='ignore')
+
+        self.prediction = theano.function(inputs  = [self.X,
+                                                     self.P,
+                                                     self.Q,
+                                                     self.dt],
+                                          outputs = [self.X_,
+                                                     self.P_],
+                                          allow_input_downcast = True)
+
+        self.update = theano.function(inputs  = [self.X,
+                                                 self.Z,
+                                                 self.P,
+                                                 self.Q,
+                                                 self.R,
+                                                 self.dt],
+                                      outputs = [self.X__,
+                                                 self.P__],
+                                      allow_input_downcast = True)
+
+
+    def fit(self,
+            time_series,
+            test_size = 0.4):
+
+        self.ar.fit(time_series,
+                    test_size = test_size)
+        set_all_param_values(self.l_, get_all_param_values(self.ar.l_))
 
 
 
