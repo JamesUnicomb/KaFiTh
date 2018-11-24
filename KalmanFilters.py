@@ -274,6 +274,59 @@ class AutoRegressiveExtendedKalmanFilter:
 
 
 
+class AutoRegressiveUnscentedKalmanFilter:
+    def __init__(self,
+                 steps    = 1,
+                 alpha    = 1e-3,
+                 beta     = 1.0,
+                 kappa    = 0.1):
+
+        lam = alpha * alpha * (steps + kappa) - steps + beta
+
+        print lam
+
+        self.X, self.Z         = T.fvectors('X','Z')
+        self.P, self.Q, self.R = T.fmatrices('P','Q','R')
+        self.dt                = T.scalar('dt')
+
+        sqrtm = MatrixSqrt()
+
+        def weighted_mean(x,w):
+            mu = T.zeros((steps, 1))
+            for i in range(2 * steps + 1):
+                mu += w[i] * x[:,i:i+1]
+            return mu
+
+        def weighted_covariance(x,mu,w):
+            sigma = T.zeros((steps,steps))
+            for i in range(2 * steps + 1):
+                sigma += w[i] * T.dot((x[:,i:i+1] - mu), (x[:,i:i+1] - mu).T)
+            return sigma
+
+        self.XB    = T.dot(T.stack(self.X).T, T.ones((1, 2 * steps +1)))
+        self.sqrtP = sqrtm(self.P)
+
+        self.XC = self.XB + T.concatenate([T.zeros((steps,1)),
+                                           T.sqrt(steps + lam) * self.sqrtP,
+                                           -T.sqrt(steps + lam) * self.sqrtP], axis=1)
+
+        W_m = T.concatenate([(lam / (steps + lam)) * T.ones(1),
+                             (1.0 / (2.0 * (steps + lam))) * T.ones(2 * steps)], axis=0)
+        W_c = T.concatenate([(lam / (steps + lam) + (1.0 - alpha * alpha + beta)) * T.ones(1),
+                             (1.0 / (2.0 * (steps + lam))) * T.ones(2 * steps)], axis=0)
+
+        print W_m.eval()
+
+        self.mu     = weighted_mean(self.XC, W_m)
+        self.sigma  = weighted_covariance(self.XC, self.mu, W_c)
+
+        self.test_f = theano.function([self.X, self.P],
+                                      [self.mu, self.XC, self.sigma],
+                                      allow_input_downcast=True,
+                                      on_unused_input='ignore')
+
+
+
 class MatrixSqrt:
     def __init__(self):
         E = T.nlinalg.Eigh()
