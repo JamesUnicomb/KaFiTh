@@ -281,8 +281,8 @@ class AutoRegressiveUnscentedKalmanFilter:
                  num_units  = 32,
                  eps        = 1e-2,
                  alpha      = 1e-3,
-                 beta       = 1.0,
-                 kappa      = 0.1):
+                 beta       = 2.0,
+                 kappa      = 0.0):
 
         lam = alpha * alpha * (steps + kappa) - steps + beta
 
@@ -346,11 +346,6 @@ class AutoRegressiveUnscentedKalmanFilter:
         self.X__ = self.X_ + T.dot(self.K, self.Z - self.Z_)
         self.P__ = self.P_ - T.dot(T.dot(self.K, self.S), self.K.T)
 
-        # self.test_f = theano.function([self.X, self.P],
-        #                               [self.X_, self.K, self.P_],
-        #                               allow_input_downcast=True,
-        #                               on_unused_input='ignore')
-
         self.prediction = theano.function(inputs  = [self.X,
                                                      self.P,
                                                      self.Q,
@@ -377,6 +372,26 @@ class AutoRegressiveUnscentedKalmanFilter:
         self.ar.fit(time_series,
                     test_size = test_size)
         set_all_param_values(self.l_, get_all_param_values(self.ar.l_))
+
+
+    def __call__(self,
+                 X, P, Z, Q, R, dt):
+        if np.all(np.isfinite(np.array(Z, dtype=np.float32))):
+            x_, p_ = self.update(X,
+                                 Z,
+                                 P,
+                                 Q,
+                                 R,
+                                 dt)
+        else:
+            x_, p_ = self.prediction(X,
+                                     P,
+                                     Q,
+                                     dt)
+
+        return x_, p_
+
+
 
 
 
