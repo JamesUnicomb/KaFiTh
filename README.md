@@ -22,7 +22,7 @@ We can also forward predict which the plot shows. As this estimate is probabilis
 
 ## Neural Network as a Motion Model
 
-We can train an autoressive neural network to forward predict the next time series measurement as shown in the figure below.
+We can train an autoregressive neural network to forward predict the next time series measurement as shown in the figure below.
 
 ![](https://github.com/JamesUnicomb/KaFiTh/blob/master/Results/AutoRegressiveModel.png)
 
@@ -39,6 +39,13 @@ We can use the autoregressive model within an EKF framework to make better predi
 Using a model for prediction makes the future estimates more accurate as shown in the plot below.
 
 ![](https://github.com/JamesUnicomb/KaFiTh/blob/master/Results/AutoRegressiveEKFPrediction.png)
+
+
+#### Unscented and Extended Kalman Filters
+
+We can use stochastic estimates for the gradient with an Unscented Kalman Filter. This will have payoffs in some scenarios (depending on the initial covariance of the estimate).
+
+![](https://github.com/JamesUnicomb/KaFiTh/blob/master/Results/AutoRegressiveUKFPrediction.png)
 
 
 ## Matrix Square Root in Python
