@@ -60,7 +60,6 @@ plt.fill_between(t,
 plt.xlim([400,700])
 plt.legend(loc='upper right')
 
-plt.tight_layout()
 plt.savefig('Results/MackeyGlassBrownianFilter.png',
             dpi=400)
 plt.show()
