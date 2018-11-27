@@ -43,6 +43,10 @@ Using a model for prediction makes the future estimates more accurate as shown i
 
 #### Unscented and Extended Kalman Filters
 
+![](https://github.com/JamesUnicomb/KaFiTh/blob/master/Results/AutoRegressiveUKF.png)
+
+#### Forward Predtiction with AutoRegressive Extended and Unscented Kalman Filters
+
 We can use stochastic estimates for the gradient with an Unscented Kalman Filter. This will have payoffs in some scenarios (depending on the initial covariance of the estimate).
 
 ![](https://github.com/JamesUnicomb/KaFiTh/blob/master/Results/AutoRegressiveUKFPrediction.png)

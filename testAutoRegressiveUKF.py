@@ -61,7 +61,8 @@ ukf_est_p = np.array(ukf_est_p)
 ekf_est_x = np.array(ekf_est_x)
 ekf_est_p = np.array(ekf_est_p)
 
-plt.figure(figsize=(12,3))
+plt.figure(figsize=(12,6))
+plt.subplot(211)
 plt.plot(t,b,'k--',label='clean Mackey-Glass Series')
 plt.scatter(t, b_, c='k', marker='x', alpha=0.2, label='noisy')
 plt.plot(t,ekf_est_x,c='C0', label='AREKF Estimate')
@@ -74,9 +75,27 @@ plt.fill_between(t,
                  ukf_est_x + 2.0 * np.sqrt(ukf_est_p),
                  ukf_est_x - 2.0 * np.sqrt(ukf_est_p),
                  color='C2', alpha=0.2, label='2 sigma Error Bounds')
-plt.xlim([1400,1900])
+plt.xlim([400,700])
 plt.ylim([-0.8,2.5])
 plt.legend(loc='upper right')
-plt.savefig('Results/AutoRegressiveUKFPrediction.png',
+
+
+plt.subplot(212)
+plt.plot(t,np.square(np.array(ekf_est_x).reshape(-1) - b), c='C0', label='AREKF MSE')
+plt.plot(t,np.square(np.array(ukf_est_x).reshape(-1) - b), c='C2', label='ARUKF MSE')
+plt.fill_between(t,
+                 4.0 * np.array(ekf_est_p, dtype=np.float32),
+                 0.0,
+                 color='C0', alpha=0.2, label='2 sigma Error Bound')
+plt.legend(loc='upper right')
+plt.fill_between(t,
+                 4.0 * np.array(ukf_est_p, dtype=np.float32),
+                 0.0,
+                 color='C2', alpha=0.2, label='2 sigma Error Bound')
+plt.legend(loc='upper right')
+plt.xlim([400,700])
+
+
+plt.savefig('Results/AutoRegressiveUKF.png',
             dpi=400)
 plt.show()

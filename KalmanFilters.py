@@ -280,7 +280,7 @@ class AutoRegressiveUnscentedKalmanFilter:
                  num_layers = 2,
                  num_units  = 32,
                  eps        = 1e-2,
-                 alpha      = 1e-3,
+                 alpha      = 1e-2,
                  beta       = 2.0,
                  kappa      = 0.0):
 
