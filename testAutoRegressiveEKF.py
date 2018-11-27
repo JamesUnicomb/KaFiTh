@@ -84,7 +84,6 @@ plt.fill_between(t,
 plt.legend(loc='upper right')
 plt.xlim([400,700])
 
-plt.tight_layout()
 plt.savefig('Results/AutoRegressiveEKF.png',
             dpi=400)
 plt.show()

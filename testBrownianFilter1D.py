@@ -63,7 +63,6 @@ plt.fill_between(t,
                  color='C0', alpha=0.2, label='2 sigma Error Bound')
 plt.legend(loc='upper right')
 
-plt.tight_layout()
 plt.savefig('Results/BrownianMotion1D.png',
             dpi=400)
 plt.show()

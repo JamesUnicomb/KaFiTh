@@ -26,7 +26,7 @@ plt.plot(t,b,label='clean Mackey-Glass Series')
 plt.plot(tl[S+K:E],res[:E],label='One Step Prediction')
 plt.plot(tl[E:],res[E:],label='Multi Step Prediction')
 plt.legend(loc='upper right')
-plt.tight_layout()
+
 plt.savefig('Results/AutoRegressiveModel.png',
             dpi=400)
 plt.show()
