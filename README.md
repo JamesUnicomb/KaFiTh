@@ -6,14 +6,16 @@ Kalman Filters with Theano
 ### Mackey-Glass Dataset
 
 Applying a Brownian Filter (constant position filter) to the Mackey-Glass time series. The filter assumes that the velocity is white noise.
-
-<img src="https://github.com/JamesUnicomb/KaFiTh/blob/master/Results/MackeyGlassBrownianFilter.png" width="640" align="center">
+<p align="center">
+  <img src="https://github.com/JamesUnicomb/KaFiTh/blob/master/Results/MackeyGlassBrownianFilter.png" width="640" />
+</p>
 
 ### Tracking and Predicting Brownian Motion
 
 If we have an underlying process that is Brownian and our measurement is corrupted with white noise, then we can find a better estimate of the mean of the time series by using the Kalman Filter.
-
-<img src="https://github.com/JamesUnicomb/KaFiTh/blob/master/Results/BrownianMotion1D.png" width="640" align="center">
+<p align="center">
+  <img src="https://github.com/JamesUnicomb/KaFiTh/blob/master/Results/BrownianMotion1D.png" width="640" />
+</p>
 
 We can also forward predict which the plot shows. As this estimate is probabilistic we can use it in other models such as VAR (value at risk models).
 
@@ -22,30 +24,36 @@ We can also forward predict which the plot shows. As this estimate is probabilis
 ## Neural Network as a Motion Model
 
 We can train an autoregressive neural network to forward predict the next time series measurement as shown in the figure below.
+<p align="center">
+  <img src="https://github.com/JamesUnicomb/KaFiTh/blob/master/Results/AutoRegressiveModel.png" width="640" />
+</p>
 
-<img src="https://github.com/JamesUnicomb/KaFiTh/blob/master/Results/AutoRegressiveModel.png" width="640" align="center">
 
 ### Extended Kalman Filter with AutoRegressive Motion Model
 
 We can use the autoregressive model within an EKF framework to make better predictions about the next state of a time series.
-
-<img src="https://github.com/JamesUnicomb/KaFiTh/blob/master/Results/AutoRegressiveEKF.png" width="640" align="center">
+<p align="center">
+  <img src="https://github.com/JamesUnicomb/KaFiTh/blob/master/Results/AutoRegressiveEKF.png" width="640" />
+</p>
 
 #### Forward Predtiction with Brownian Filter and AutoRegressive Extended Kalman Filters
 
 Using a model for prediction makes the future estimates more accurate as shown in the plot below.
-
-<img src="https://github.com/JamesUnicomb/KaFiTh/blob/master/Results/AutoRegressiveEKFPrediction.png" width="640" align="center">
+<p align="center">
+  <img src="https://github.com/JamesUnicomb/KaFiTh/blob/master/Results/AutoRegressiveEKFPrediction.png" width="640" />
+</p>
 
 #### Unscented and Extended Kalman Filters
-
-<img src="https://github.com/JamesUnicomb/KaFiTh/blob/master/Results/AutoRegressiveUKF.png" width="640" align="center">
+<p align="center">
+  <img src="https://github.com/JamesUnicomb/KaFiTh/blob/master/Results/AutoRegressiveUKF.png" width="640" />
+</p>
 
 #### Forward Predtiction with AutoRegressive Extended and Unscented Kalman Filters
 
 We can use stochastic estimates for the gradient with an Unscented Kalman Filter. This will have payoffs in some scenarios (depending on the initial covariance of the estimate).
-
-<img src="https://github.com/JamesUnicomb/KaFiTh/blob/master/Results/AutoRegressiveUKFPrediction.png" width="640" align="center">
+<p align="center">
+  <img src="https://github.com/JamesUnicomb/KaFiTh/blob/master/Results/AutoRegressiveUKFPrediction.png" width="640" />
+</p>
 
 
 ## Matrix Square Root in Python
@@ -81,5 +89,6 @@ SqrtX = sqrtm(X)                 #This gives you the square root of the matrix X
 
 ### Speed Pay-Off
 From the plot, we can see that the precompiled theano function is an order of magnitude (approx. 6 times faster than using a scipy function).
-
-<img src="https://github.com/JamesUnicomb/KaFiTh/blob/master/Results/MatrixSquareRootTiming.png" width="320" align="center">
+<p align="center">
+  <img src="https://github.com/JamesUnicomb/KaFiTh/blob/master/Results/MatrixSquareRootTiming.png" width="320" />
+</p>
